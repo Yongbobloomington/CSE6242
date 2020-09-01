@@ -67,14 +67,15 @@ class HW2_sql():
     # Part a.i Create Tables [2 points]
     def part_ai_1(self,connection):
         ############### EDIT SQL STATEMENT ###################################
-        part_ai_1_sql = ""
+        part_ai_1_sql = "create table movies(id integer, title text, score real);"
         ######################################################################
         
         return self.execute_query(connection, part_ai_1_sql)
 
     def part_ai_2(self,connection):
         ############### EDIT SQL STATEMENT ###################################
-        part_ai_2_sql = ""
+        part_ai_2_sql = """create table movie_cast(cast_id integer, 
+        movie_id integer, cast_name text, birthday text, popularity real);"""
         ######################################################################
         
         return self.execute_query(connection, part_ai_2_sql)
@@ -82,7 +83,15 @@ class HW2_sql():
     # Part a.ii Import Data [2 points]
     def part_aii_1(self,connection,path):
         ############### CREATE IMPORT CODE BELOW ############################
-
+        with open('data/movies.csv', encoding='utf-8') as f:
+            rows = csv.reader(f, delimiter=',')
+            for row in rows:
+                 title = row[1]
+                 title = title.replace(',', '')
+                 title = str(title).encode(encoding='ascii',errors='ignore').decode()
+                 title = title.replace("'", ' ')
+                 sql ="insert into movies values(" + row[0] + ", '" + title + "', " + row[2] + ");"
+                 cursor = connection.execute(sql)
        ######################################################################
         
         sql = "SELECT COUNT(id) FROM movies;"
@@ -91,7 +100,15 @@ class HW2_sql():
     
     def part_aii_2(self,connection, path):
         ############### CREATE IMPORT CODE BELOW ############################
-        
+        with open('data/movie_cast.csv', encoding='utf-8') as f:
+            rows = csv.reader(f, delimiter=',')
+            for row in rows:
+                 name = row[2]
+                 name = name.replace(',', '')
+                 name = str(name).encode(encoding='ascii',errors='ignore').decode()
+                 name = name.replace("'", ' ')
+                 sql ="insert into movie_cast values(" + row[0] + ", " + row[1] + ", '" + name + "', '" +  row[3] + "', " + row[4] + ");"
+                 cursor = connection.execute(sql)
         ######################################################################
         
         sql = "SELECT COUNT(cast_id) FROM movie_cast;"
