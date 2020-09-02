@@ -74,8 +74,8 @@ class HW2_sql():
 
     def part_ai_2(self,connection):
         ############### EDIT SQL STATEMENT ###################################
-        part_ai_2_sql = """create table movie_cast(cast_id integer, 
-        movie_id integer, cast_name text, birthday text, popularity real);"""
+        part_ai_2_sql = """create table movie_cast(movie_id integer, 
+        cast_id integer, cast_name text, birthday text, popularity real);"""
         ######################################################################
         
         return self.execute_query(connection, part_ai_2_sql)
@@ -118,13 +118,14 @@ class HW2_sql():
     # Part a.iii Vertical Database Partitioning [5 points]
     def part_aiii(self,connection):
         ############### EDIT CREATE TABLE SQL STATEMENT ###################################
-        part_aiii_sql = ""
+        part_aiii_sql = """create table cast_bio(cast_id integer, 
+                         cast_name text, birthday text, popularity real);"""
         ######################################################################
         
         self.execute_query(connection, part_aiii_sql)
         
         ############### CREATE IMPORT CODE BELOW ############################
-        part_aiii_insert_sql = ""
+        part_aiii_insert_sql = "insert into cast_bio select distinct cast_id, cast_name, birthday, popularity from movie_cast;"
         ######################################################################
         
         self.execute_query(connection, part_aiii_insert_sql)
@@ -135,28 +136,28 @@ class HW2_sql():
        
 
     # Part b Create Indexes [1 points]
-    def part_b_1(self,connection):
+    def part_b_1(self, connection):
         ############### EDIT SQL STATEMENT ###################################
-        part_b_1_sql = ""
+        part_b_1_sql = "create unique index movie_index on movies(id);"
         ######################################################################
         return self.execute_query(connection, part_b_1_sql)
     
     def part_b_2(self,connection):
         ############### EDIT SQL STATEMENT ###################################
-        part_b_2_sql = ""
+        part_b_2_sql = "create index cast_index on movie_cast(cast_id);"
         ######################################################################
         return self.execute_query(connection, part_b_2_sql)
     
     def part_b_3(self,connection):
         ############### EDIT SQL STATEMENT ###################################
-        part_b_3_sql = ""
+        part_b_3_sql = "create unique index cast_bio_index on cast_bio(cast_id)"
         ######################################################################
         return self.execute_query(connection, part_b_3_sql)
     
     # Part c Calculate a Proportion [3 points]
     def part_c(self,connection):
         ############### EDIT SQL STATEMENT ###################################
-        part_c_sql = ""
+        part_c_sql = "SELECT printf('%.2f', (SELECT (SELECT CAST((COUNT(id) * 100) AS REAL) FROM movies WHERE title LIKE '%war%' AND score > 50)/CAST(COUNT(*) AS REAL) from movies));"
         ######################################################################
         cursor = connection.execute(part_c_sql)
         return cursor.fetchall()[0][0]
@@ -164,7 +165,12 @@ class HW2_sql():
     # Part d Find the Most Prolific Actors [4 points]
     def part_d(self,connection):
         ############### EDIT SQL STATEMENT ###################################
-        part_d_sql = ""
+        part_d_sql =  """SELECT cast_name, COUNT(movie_id) as appearance_count 
+                         from movie_cast 
+                         where popularity > cast(10 as real)           
+                         GROUP BY cast_id
+                         ORDER BY appearance_count desc , cast_name asc 
+                         Limit 5;"""
         ######################################################################
         cursor = connection.execute(part_d_sql)
         return cursor.fetchall()
@@ -172,7 +178,13 @@ class HW2_sql():
     # Part e Find the Highest Scoring Movies With the Least Amount of Cast [4 points]
     def part_e(self,connection):
         ############### EDIT SQL STATEMENT ###################################
-        part_e_sql = ""
+        part_e_sql = """select movies.title, printf('%.2f', movies.score), count(movie_cast.cast_id) as cast_count 
+                     from movies
+                     inner join movie_cast 
+                     on movies.id = movie_cast.movie_id
+                     group by movies.id
+                     order by movies.score desc, cast_count asc, movies.title asc
+                     limit 5;"""
         ######################################################################
         cursor = connection.execute(part_e_sql)
         return cursor.fetchall()
