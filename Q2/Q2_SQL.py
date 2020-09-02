@@ -157,7 +157,9 @@ class HW2_sql():
     # Part c Calculate a Proportion [3 points]
     def part_c(self,connection):
         ############### EDIT SQL STATEMENT ###################################
-        part_c_sql = "SELECT printf('%.2f', (SELECT (SELECT CAST((COUNT(id) * 100) AS REAL) FROM movies WHERE title LIKE '%war%' AND score > 50)/CAST(COUNT(*) AS REAL) from movies));"
+        part_c_sql = """select printf('%.2f', (SELECT (select cast((count(id) * 100) as real) 
+                        FROM movies WHERE LOWER(title) LIKE '%war%' 
+                        AND score > CAST(50 as REAL))/cast(count(*) as real) from movies));"""
         ######################################################################
         cursor = connection.execute(part_c_sql)
         return cursor.fetchall()[0][0]
@@ -193,14 +195,16 @@ class HW2_sql():
     def part_f(self,connection):
         ############### EDIT SQL STATEMENT ###################################
         part_f_sql = """select movie_cast.cast_id, movie_cast.cast_name, 
-                        cast(printf('%.2f', avg(movies.score)) as real) as average_score
-                     from movie_cast
-                     inner join movies 
-                     on movie_cast.movie_id = movies.id 
+                     printf('%.2f', avg(movies.score)) as average_score
+                     from movies inner join movie_cast 
+                     on movies.id = movie_cast.movie_id 
+                     where movies.score >= cast(25 as real)
                      group by movie_cast.cast_id
-                     having (movies.score >= 25.00 and count(movie_cast.movie_id) > 2)
-                     order by average_score desc, movie_cast.cast_name asc
+                     having count(movie_cast.movie_id) > 2
+                     order by avg(movies.score) desc, movie_cast.cast_name asc
                      limit 10;"""
+
+
         ######################################################################
         cursor = connection.execute(part_f_sql)
         return cursor.fetchall()
@@ -209,6 +213,12 @@ class HW2_sql():
     def part_g(self,connection):
         ############### EDIT SQL STATEMENT ###################################
         part_g_sql = ""
+        #part_g_sql = """create view good_collaboration(
+        #         cast_member_id1, cast_member_id2, movie_count, average_movie_score)
+        #         as
+        #         select t1.cast_id, t2.cast_id, count(movie_id), avg(movie_score) 
+        #         from movie_cast, movies
+        #         where ;"""
         ######################################################################
         return self.execute_query(connection, part_g_sql)
     
@@ -222,11 +232,18 @@ class HW2_sql():
     # Part h FTS [4 points]
     def part_h(self,connection,path):
         ############### EDIT SQL STATEMENT ###################################
-        part_h_sql = ""
+        part_h_sql = "create virtual table movie_overview using FTS4 (id integer, overview text);"
         ######################################################################
         connection.execute(part_h_sql)
         ############### CREATE IMPORT CODE BELOW ############################
-        
+        with open('data/movie_overview.csv', encoding='utf-8') as f:
+            rows = csv.reader(f, delimiter=',')
+            for row in rows:
+                 id = row[0]
+                 id = str(row[0]).encode(encoding='ascii',errors='ignore').decode()
+                 sql ="insert into movie_overview values(" + id + ", '" + row[1] + "');"
+                 print(sql)
+                 cursor = connection.execute(sql)        
         ######################################################################
         sql = "SELECT COUNT(id) FROM movie_overview;"
         cursor = connection.execute(sql)
