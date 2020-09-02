@@ -192,7 +192,15 @@ class HW2_sql():
     # Part f Get High Scoring Actors [4 points]
     def part_f(self,connection):
         ############### EDIT SQL STATEMENT ###################################
-        part_f_sql = ""
+        part_f_sql = """select movie_cast.cast_id, movie_cast.cast_name, 
+                        cast(printf('%.2f', avg(movies.score)) as real) as average_score
+                     from movie_cast
+                     inner join movies 
+                     on movie_cast.movie_id = movies.id 
+                     group by movie_cast.cast_id
+                     having (movies.score >= 25.00 and count(movie_cast.movie_id) > 2)
+                     order by average_score desc, movie_cast.cast_name asc
+                     limit 10;"""
         ######################################################################
         cursor = connection.execute(part_f_sql)
         return cursor.fetchall()
