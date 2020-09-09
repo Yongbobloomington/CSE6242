@@ -92,6 +92,11 @@ class HW2_sql():
                  title = title.replace("'", ' ')
                  sql ="INSERT INTO movies VALUES(" + row[0] + ", '" + title + "', " + row[2] + ");"
                  cursor = connection.execute(sql)
+
+       # then remove it when uploading to Gradescope. n the file open function
+
+       # import as real and output as printf
+
        ######################################################################
         
         sql = "SELECT COUNT(id) FROM movies;"
@@ -205,6 +210,7 @@ class HW2_sql():
                      ORDER BY AVG(movies.score) DESC, movie_cast.cast_name ASC
                      LIMIT 10;"""
 
+       # round the score than rank
 
         ######################################################################
         cursor = connection.execute(part_f_sql)
@@ -213,19 +219,36 @@ class HW2_sql():
     # Part g Creating Views [6 points]
     def part_g(self,connection):
         ############### EDIT SQL STATEMENT ###################################
-        part_g_sql = ""
-        #part_g_sql = """create view good_collaboration(
-        #         cast_member_id1, cast_member_id2, movie_count, average_movie_score)
-        #         as
-        #         select t1.cast_id, t2.cast_id, count(movie_id), avg(movie_score) 
-        #         from movie_cast, movies
-        #         where ;"""
+
+        part_g_sql = """create view good_collaboration(
+                 cast_member_id1, cast_member_id2, movie_count, average_movie_score)
+                 as
+                 select t1.cast_id as cast_member_id1,
+                      t2.cast_id as cast_member_id2, 
+                      count(t1.movie_id) as movie_count,
+                      avg(t3.score) as average_movie_score
+                      from movie_cast as t1 
+                      inner join movie_cast as t2 on t1.movie_id = t2.movie_id
+                      inner join movies as t3 on t1.movie_id = t3.id 
+                      where t1.cast_id < t2.cast_id
+                      group by t1.cast_id, t2.cast_id
+                      having movie_count > 2 and average_movie_score >= cast(40 as real);"""
+
         ######################################################################
         return self.execute_query(connection, part_g_sql)
     
     def part_gi(self,connection):
         ############### EDIT SQL STATEMENT ###################################
-        part_g_i_sql = ""
+
+        part_g_i_sql = """select cast_member_id1, cast_bio.cast_name, 
+                             printf('%.2f', avg(average_movie_score)) as collaboration_score
+                          from good_collaboration 
+                             inner join cast_bio
+                                 on cast_bio.cast_id = cast_member_id1
+                          group by cast_member_id1
+                order by collaboration_score desc, cast_bio.cast_name asc
+                limit 5;"""
+ 
         ######################################################################
         cursor = connection.execute(part_g_i_sql)
         return cursor.fetchall()
@@ -247,7 +270,10 @@ class HW2_sql():
                  overview = str(overview).encode(encoding='ascii',errors='ignore').decode()
                  overview = overview.replace("'", ' ')
                  sql ="INSERT INTO movie_overview VALUES(" + id + ", '" + overview + "');"
-                 cursor = connection.execute(sql)        
+                 cursor = connection.execute(sql)  
+                 
+        # using utf-8-sig
+
         ######################################################################
         sql = "SELECT COUNT(*) FROM movie_overview;"
         cursor = connection.execute(sql)
