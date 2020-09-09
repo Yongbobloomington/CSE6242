@@ -92,6 +92,11 @@ class HW2_sql():
                  title = title.replace("'", ' ')
                  sql ="INSERT INTO movies VALUES(" + row[0] + ", '" + title + "', " + row[2] + ");"
                  cursor = connection.execute(sql)
+
+       # then remove it when uploading to Gradescope. n the file open function
+
+       # import as real and output as printf
+
        ######################################################################
         
         sql = "SELECT COUNT(id) FROM movies;"
@@ -205,6 +210,7 @@ class HW2_sql():
                      ORDER BY AVG(movies.score) DESC, movie_cast.cast_name ASC
                      LIMIT 10;"""
 
+       # round the score than rank
 
         ######################################################################
         cursor = connection.execute(part_f_sql)
@@ -247,7 +253,10 @@ class HW2_sql():
                  overview = str(overview).encode(encoding='ascii',errors='ignore').decode()
                  overview = overview.replace("'", ' ')
                  sql ="INSERT INTO movie_overview VALUES(" + id + ", '" + overview + "');"
-                 cursor = connection.execute(sql)        
+                 cursor = connection.execute(sql)  
+                 
+        # using utf-8-sig
+
         ######################################################################
         sql = "SELECT COUNT(*) FROM movie_overview;"
         cursor = connection.execute(sql)
