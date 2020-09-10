@@ -83,7 +83,7 @@ class HW2_sql():
     # Part a.ii Import Data [2 points]
     def part_aii_1(self,connection,path):
         ############### CREATE IMPORT CODE BELOW ############################
-        with open('data/movies.csv', encoding='utf-8') as f:
+        with open('data/movies.csv') as f:
             rows = csv.reader(f, delimiter=',')
             for row in rows:
                  title = row[1]
@@ -93,10 +93,6 @@ class HW2_sql():
                  sql ="INSERT INTO movies VALUES(" + row[0] + ", '" + title + "', " + row[2] + ");"
                  cursor = connection.execute(sql)
 
-       # then remove it when uploading to Gradescope. n the file open function
-
-       # import as real and output as printf
-
        ######################################################################
         
         sql = "SELECT COUNT(id) FROM movies;"
@@ -105,7 +101,7 @@ class HW2_sql():
     
     def part_aii_2(self,connection, path):
         ############### CREATE IMPORT CODE BELOW ############################
-        with open('data/movie_cast.csv', encoding='utf-8') as f:
+        with open('data/movie_cast.csv') as f:
             rows = csv.reader(f, delimiter=',')
             for row in rows:
                  name = row[2]
@@ -210,7 +206,6 @@ class HW2_sql():
                      ORDER BY AVG(movies.score) DESC, movie_cast.cast_name ASC
                      LIMIT 10;"""
 
-       # round the score than rank
 
         ######################################################################
         cursor = connection.execute(part_f_sql)
@@ -261,7 +256,7 @@ class HW2_sql():
         ######################################################################
         connection.execute(part_h_sql)
         ############### CREATE IMPORT CODE BELOW ############################
-        with open('data/movie_overview.csv', encoding='utf-8') as f:
+        with open('data/movie_overview.csv') as f:
             rows = csv.reader(f, delimiter=',')
             for row in rows:
                  id = row[0]
@@ -272,17 +267,14 @@ class HW2_sql():
                  sql ="INSERT INTO movie_overview VALUES(" + id + ", '" + overview + "');"
                  cursor = connection.execute(sql)  
                  
-        # using utf-8-sig
-
         ######################################################################
-        sql = "SELECT COUNT(*) FROM movie_overview;"
+        sql = "SELECT COUNT(id) FROM movie_overview;"
         cursor = connection.execute(sql)
         return cursor.fetchall()[0][0]
         
     def part_hi(self,connection):
         ############### EDIT SQL STATEMENT ###################################
-        #part_hi_sql = """select count(*) from movie_overview where 
-        #         lower(overview) like 'fight';"""
+
         part_hi_sql = """SELECT COUNT(overview) FROM movie_overview WHERE 
                  overview MATCH 'fight';"""
         ######################################################################

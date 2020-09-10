@@ -419,7 +419,7 @@ def return_argo_lite_snapshot()->str:
     """
     Return the shared URL of your published graph in Argo-Lite
     """
-    return 'https://poloclub.github.io/argo-graph-lite/#6276eb8e-8398-4bfd-9a72-59228a980ddd'
+    return 'https://poloclub.github.io/argo-graph-lite/#10202b3d-d157-4654-bcdb-049ad31449a0'
 
 
 if __name__ == "__main__":
